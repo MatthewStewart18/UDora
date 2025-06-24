@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://github.com/AI-secure/UDora/assets/icon.png" width="200" alt="UDora Logo">
+<img src="https://github.com/AI-secure/UDora/blob/main/assets/icon.png" width="200" alt="UDora Logo">
 
 # 🎯 [ICML 2025] UDora: A Unified Red Teaming Framework against LLM Agents
 
@@ -17,7 +17,7 @@
 
 ## 🔥 Pipeline Overview
 
-![UDora Pipeline](https://github.com/AI-secure/UDora/assets/pipeline.pdf)
+![UDora Pipeline](https://github.com/AI-secure/UDora/blob/main/assets/pipeline.pdf)
 
 *UDora's dynamic attack pipeline: (1) Initial reasoning collection, (2) Weighted interval scheduling for optimal noise placement, (3) Adversarial string optimization, (4) Iterative refinement based on agent feedback.*
 
