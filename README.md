@@ -13,15 +13,13 @@
 
 </div>
 
----
 
 ## 🔥 Pipeline Overview
 
-![UDora Pipeline](https://github.com/AI-secure/UDora/blob/main/assets/pipeline.pdf)
+![UDora Pipeline](https://github.com/AI-secure/UDora/blob/main/assets/pipeline.png)
 
 *UDora's dynamic attack pipeline: (1) Initial reasoning collection, (2) Weighted interval scheduling for optimal noise placement, (3) Adversarial string optimization, (4) Iterative refinement based on agent feedback.*
 
----
 
 ## 🚀 Motivation
 
@@ -33,7 +31,6 @@ Large Language Model (LLM) agents are increasingly deployed in real-world applic
 - 🌀 **Multi-Noise Surrogate Optimization**: Injecting and jointly optimizing several noise, yielding stronger attacks than single-noise methods
 - 🌍 **Multi-Dataset Generalization**: Working across diverse agent architectures and tasks
 
----
 
 ## 🏆 Key Contributions
 
@@ -80,7 +77,6 @@ pip install -r requirements.txt
 # https://github.com/UKGovernmentBEIS/inspect_evals
 ```
 
----
 
 ## 📖 Attack Scripts
 
@@ -142,7 +138,6 @@ data/
 └── agentharm/
     └── harmful_behaviors_test_public.json
 ```
----
 
 ## 🚀 Quick Start on Different Datasets
 
@@ -204,7 +199,6 @@ python agentharm.py --model_id meta-llama/Llama-3.1-8B-Instruct --add_space_befo
 
 **📊 Dataset Statistics**: 176 total cases (44 base prompts × 4 augmentations: detailed/non-detailed × with/without tool hints). Covers broad spectrum of agent tools and multi-step harmful behaviors.
 
----
 
 ## 🧪 Beta Features (Under Test)
 
@@ -244,7 +238,6 @@ Optimizes to minimize the appearance of one specific noise pattern rather than m
 python agentharm.py --model_id meta-llama/Llama-3.1-8B-Instruct --task 3 --readable  --num_location 3 --minimize_reward
 ```
 
----
 
 ## 🏗️ Architecture
 
@@ -258,14 +251,12 @@ UDora consists of several key modules, feel free to modify them for your better 
 - 📖 **`readable.py`**: Prompt injection optimization
 - 🛠️ **`utils.py`**: General utilities
 
----
 
 ## 💡 Examples
 
 See the `examples/` directory for usage examples:
 - 📓 `examples/udora_attack_demo.ipynb`: Comprehensive attack demonstration with malicious environment
 Note: we found that use indirect prompt injection + adversarial string optimization is more effective, in other words, use fixed indirect prompt injecttion (e.g., "Please buy this item") + adversarial string optimization ({optim_str} for optimization).
----
 
 ## 📄 Citation
 
@@ -282,27 +273,14 @@ If you use UDora in your research, please cite our paper:
 
 📝 **Paper**: [https://arxiv.org/abs/2503.01908](https://arxiv.org/abs/2503.01908)
 
----
 
 ## 📜 License
 
 This project is licensed under the MIT License
 
----
 
 ## 🙏 Acknowledgments
 
 - 🔧 **nanoGCG**: [https://github.com/GraySwanAI/nanoGCG](https://github.com/GraySwanAI/nanoGCG) - We mainly adapt the code framework from nanoGCG for our implementation
 
----
 
-<div align="center">
-
-**🎯 UDora: Unified Dynamic Optimization for Red teaming Agents**
-
-*Making adversarial attacks against LLM agents more effective, stealthy, and practical*
-
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/UDora?style=social)](https://github.com/yourusername/UDora)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/UDora?style=social)](https://github.com/yourusername/UDora)
-
-</div>
