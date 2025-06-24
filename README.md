@@ -9,7 +9,7 @@
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-* UDora (Unified Dynamic Optimization for Red teaming Agents) is a comprehensive framework for adversarial attacks against LLM-based agents that dynamically optimizes adversarial strings by leveraging agents' own reasoning processes to trigger targeted malicious actions.*
+*UDora (Unified Dynamic Optimization for Red teaming Agents) is a comprehensive framework for adversarial attacks against LLM-based agents that dynamically optimizes adversarial strings by leveraging agents' own reasoning processes to trigger targeted malicious actions.*
 
 </div>
 
