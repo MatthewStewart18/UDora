@@ -203,13 +203,14 @@ def run_security_copilot_attack(model, tokenizer, goals: List[str], targets: Lis
         
         try:
             # Run UDora attack
-            result = udora_run(
-                model=model,
-                tokenizer=tokenizer,
-                messages=goal,
-                target=target,
-                config=config
-            )
+            result = udora_run(model, tokenizer, goal, target, config)
+            # result = udora_run(
+            #     model=model,
+            #     tokenizer=tokenizer,
+            #     messages=goal,
+            #     target=target,
+            #     config=config
+            # )
             
             # Check if attack succeeded
             success = result.success if hasattr(result, 'success') else False
