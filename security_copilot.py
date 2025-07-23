@@ -206,7 +206,7 @@ def run_security_copilot_attack(model, tokenizer, goals: List[str], targets: Lis
             result = udora_run(
                 model=model,
                 tokenizer=tokenizer,
-                goal=goal,
+                messages=goal,
                 target=target,
                 config=config
             )
