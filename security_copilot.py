@@ -39,6 +39,13 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from udora import UDoraConfig, run as udora_run
 from attack_utils import *
 
+if torch.cuda.is_available():
+      print(f"Using GPU: {torch.cuda.get_device_name(0)}")
+      device = torch.device("cuda")
+else:
+    print("CUDA not available - using CPU")
+    device = torch.device("cpu")
+
 
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments for Security Copilot attack configuration."""
@@ -60,14 +67,14 @@ def parse_arguments() -> argparse.Namespace:
                        help='Security Copilot attack type')
     
     # UDora Attack Parameters
-    parser.add_argument('--num_steps', type=int, default=250, help='Number of optimization steps')
+    parser.add_argument('--num_steps', type=int, default=10, help='Number of optimization steps')
     parser.add_argument('--search_width', type=int, default=200, help='Number of candidate sequences per optimization step')
     parser.add_argument('--weight', type=float, default=1.0, help='Exponential weighting factor for different token positions')
     parser.add_argument('--topk', type=int, default=48, help='Top-K gradient directions to consider')
     parser.add_argument('--n_replace', type=int, default=1, help='Number of token positions to modify per candidate')
     parser.add_argument('--num_location', type=int, default=2, help='Number of target insertion locations')
     parser.add_argument('--prefix_update_frequency', type=int, default=1, help='How often to update reasoning context')
-    parser.add_argument('--max_new_tokens', type=int, default=400, help='Maximum number of new tokens to generate')
+    parser.add_argument('--max_new_tokens', type=int, default=300, help='Maximum number of new tokens to generate')
     
     # Advanced Options
     parser.add_argument('--buffer_size', type=int, default=0, help='Attack buffer size (0 for single candidate)')
@@ -172,98 +179,48 @@ def create_udora_config(args: argparse.Namespace, model_name: str, task: str) ->
     )
 
 
-def run_security_copilot_attack(model, tokenizer, goals: List[str], targets: List[str], 
-                               config: UDoraConfig, output_path: str, resume: bool):
+def run_security_copilot_attack(
+    model: AutoModelForCausalLM,
+    tokenizer: AutoTokenizer, 
+    goals: List[str],
+    targets: List[str], 
+    config: UDoraConfig,
+    output_path: str,
+    resume: bool):
     """Run Security Copilot attack using UDora framework."""
     print(f"Starting Security Copilot attack with {len(goals)} scenarios")
-    print(f"Target functions: {set(targets)}")
     
     results = []
     success_count = 0
-    
-    # Resume from existing results if requested
-    if resume and os.path.exists(output_path):
-        print(f"Resuming from existing results: {output_path}")
-        with open(output_path, 'rb') as f:
-            existing_results = pickle.load(f)
-        start_idx = len(existing_results)
-        results = existing_results
-        success_count = sum(1 for r in results if r.get('success', False))
-    else:
-        start_idx = 0
-    
-    # Run attack on remaining scenarios
-    for i in tqdm(range(start_idx, len(goals)), desc="Security Copilot Attack Progress"):
+    start_index = 0
+
+    # Handle resume functionality
+    if resume:
+        results, start_index, success_count = load_existing_results(output_path)
+
+    # Process each goal
+    for i in tqdm(range(start_index, len(goals)), desc="Attacking Security Copilot Goals"):
         goal = goals[i]
         target = targets[i]
         
-        print(f"\n--- Scenario {i+1}/{len(goals)} ---")
-        print(f"Target function: {target}")
-        print(f"Goal prompt: {goal[:100]}...")
+        # Run UDora attack
+        result = udora_run(model, tokenizer, goal, target, config)
         
-        try:
-            # Run UDora attack
-            result = udora_run(model, tokenizer, goal, target, config)
-            # result = udora_run(
-            #     model=model,
-            #     tokenizer=tokenizer,
-            #     messages=goal,
-            #     target=target,
-            #     config=config
-            # )
-            
-            # Check if attack succeeded
-            success = result.success if hasattr(result, 'success') else False
-            if success:
-                success_count += 1
-                print(f"✓ Attack succeeded! Target '{target}' triggered.")
-            else:
-                print(f"✗ Attack failed. Target '{target}' not triggered.")
-            
-            # Store result
-            result_dict = {
-                'scenario_id': i,
-                'goal': goal,
-                'target': target,
-                'success': success,
-                'best_loss': result.best_loss if hasattr(result, 'best_loss') else None,
-                'num_steps': result.num_steps if hasattr(result, 'num_steps') else None,
-                'adversarial_string': result.best_string if hasattr(result, 'best_string') else None
-            }
-            results.append(result_dict)
-            
-            # Save incremental results
-            with open(output_path, 'wb') as f:
-                pickle.dump(results, f)
-                
-        except Exception as e:
-            print(f"Error processing scenario {i}: {str(e)}")
-            # Store failed result
-            results.append({
-                'scenario_id': i,
-                'goal': goal,
-                'target': target,
-                'success': False,
-                'error': str(e)
-            })
+        # determine success
+        success = get_success_status(result)
+        success_count += int(success)
+        
+        # print progress
+        print_attack_progress(i, len(goals), success, success_count, start_index, f"Target: {target}")
+        
+        # append the raw result object
+        results.append(result)
+        
+        # save results incrementally
+        save_results_incrementally(results, output_path)
     
-    # Print final results
+    # print final results
     print_final_results(success_count, len(results), output_path)
-
-
-def print_final_results(success_count: int, total_count: int, output_path: str):
-    """Print final attack results summary."""
-    success_rate = (success_count / total_count) * 100 if total_count > 0 else 0
-    
-    print("\n" + "="*60)
-    print("SECURITY COPILOT ATTACK RESULTS")
-    print("="*60)
-    print(f"Total scenarios: {total_count}")
-    print(f"Successful attacks: {success_count}")
-    print(f"Success rate: {success_rate:.2f}%")
-    print(f"Results saved to: {output_path}")
-    print("="*60)
-
 
 def main():
     """Main execution function."""
