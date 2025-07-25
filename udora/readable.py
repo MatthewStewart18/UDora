@@ -205,7 +205,7 @@ class ReadableOptimizer:
         
         # Create bonus tensor for full vocabulary
         vocab_bonus = torch.zeros_like(grad)
-        vocab_bonus[top_indices] = perplexity_bonus
+        vocab_bonus[top_indices] = perplexity_bonus.to(grad.dtype)
         
         # Apply bonus to gradients (subtract bonus from gradient to favor lower perplexity tokens)
         modified_grad = grad - vocab_bonus
